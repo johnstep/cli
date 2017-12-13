@@ -59,6 +59,7 @@ type buildOptions struct {
 	cacheFrom      []string
 	compress       bool
 	securityOpt    []string
+	storageOpt     []string
 	networkMode    string
 	squash         bool
 	target         string
@@ -129,6 +130,8 @@ func NewBuildCommand(dockerCli command.Cli) *cobra.Command {
 	flags.StringSliceVar(&options.cacheFrom, "cache-from", []string{}, "Images to consider as cache sources")
 	flags.BoolVar(&options.compress, "compress", false, "Compress the build context using gzip")
 	flags.StringSliceVar(&options.securityOpt, "security-opt", []string{}, "Security options")
+	flags.StringSliceVar(&options.storageOpt, "storage-opt", []string{}, "Storage driver options for containers")
+	flags.SetAnnotation("storage-opt", "version", []string{"1.36"})
 	flags.StringVar(&options.networkMode, "network", "default", "Set the networking mode for the RUN instructions during build")
 	flags.SetAnnotation("network", "version", []string{"1.25"})
 	flags.Var(&options.extraHosts, "add-host", "Add a custom host-to-IP mapping (host:ip)")
@@ -371,6 +374,7 @@ func runBuild(dockerCli command.Cli, options buildOptions) error {
 		Labels:         opts.ConvertKVStringsToMap(options.labels.GetAll()),
 		CacheFrom:      options.cacheFrom,
 		SecurityOpt:    options.securityOpt,
+		StorageOpt:     opts.ConvertKVStringsToMap(options.storageOpt),
 		NetworkMode:    options.networkMode,
 		Squash:         options.squash,
 		ExtraHosts:     options.extraHosts.GetAll(),
